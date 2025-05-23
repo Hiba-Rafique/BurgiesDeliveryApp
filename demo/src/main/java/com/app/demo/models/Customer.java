@@ -1,13 +1,14 @@
 package com.app.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
 public class Customer extends User {
-    private String phoneNum;
     private String address;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -15,7 +16,10 @@ public class Customer extends User {
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private ArrayList<Order> orders;
+    @JsonManagedReference  // serialize orders normally here
+    private List<Order> orders;
+
+
 
     public Customer(){}
     public Customer(String phoneNum, String address, String id) {}
@@ -26,6 +30,6 @@ public class Customer extends User {
     public Cart getCart() { return cart; }
     public void setCart(Cart cart) { this.cart = cart; }
 
-    public ArrayList<Order> getOrders() { return orders; }
-    public void setOrders(ArrayList<Order> orders) { this.orders = orders; }
+    public List<Order> getOrders() { return orders; }
+    public void setOrders(List<Order> orders) { this.orders = orders; }
 }

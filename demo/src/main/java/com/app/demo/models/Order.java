@@ -1,10 +1,13 @@
 package com.app.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.lang.reflect.Array;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -15,16 +18,18 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference  // prevent recursion during JSON serialization
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private ArrayList<OrderItem> orderItems;
+    @JsonManagedReference
+    private List<OrderItem> orderItems;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private LocalDateTime date;
 
     public Order(){}
     public Order(long id, User user, ArrayList<OrderItem> orderItems, OrderStatus status, Date date) {}
@@ -35,12 +40,12 @@ public class Order {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public ArrayList<OrderItem> getOrderItems() { return orderItems; }
-    public void setOrderItems(ArrayList<OrderItem> orderItems) { this.orderItems = orderItems; }
+    public List<OrderItem> getOrderItems() { return orderItems; }
+    public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
 
     public OrderStatus getStatus() { return status; }
     public void setStatus(OrderStatus status) { this.status = status; }
 
-    public Date getDate() { return date; }
-    public void setDate(Date date) { this.date = date; }
+    public LocalDateTime getDate() { return date; }
+    public void setDate(LocalDateTime date) { this.date = date; }
 }

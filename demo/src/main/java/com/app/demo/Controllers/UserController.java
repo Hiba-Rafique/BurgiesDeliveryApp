@@ -1,8 +1,8 @@
 package com.app.demo.Controllers;
 
 import com.app.demo.DTOs.LoginRequest;
-import com.app.demo.models.Role;
-import com.app.demo.models.User;
+import com.app.demo.models.*;
+import com.app.demo.repository.CustomerRepository;
 import com.app.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,31 +18,34 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    private final UserRepository userrepository;
+    private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
 
     @Autowired
-    public UserController(UserRepository userrepository) {
-        this.userrepository = userrepository;
+    public UserController(UserRepository userRepository, CustomerRepository customerRepository) {
+        this.userRepository = userRepository;
+        this.customerRepository = customerRepository;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
-        if (userrepository.findByEmail(user.getEmail()).isPresent()) {
+    public ResponseEntity<String> registerUser(@RequestBody Customer customerData) {
+        if (userRepository.findByEmail(customerData.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("A user with this email already exists");
         }
 
-        user.setRole(Role.CUSTOMER);
-        userrepository.save(user);
+        customerData.setRole(Role.CUSTOMER); // set role before saving
 
-        return ResponseEntity.status(HttpStatus.CREATED)  //sends codes that can be used as conditions in flutter!! eg if code==200 then userdashboard() page
-                .body("Registration successful");
+        // Save customer directly (which also saves user fields)
+        customerRepository.save(customerData);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Customer registration successful");
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest login) {
-        User storedUser = userrepository.findByEmail(login.getEmail()).orElse(null);
+        User storedUser = userRepository.findByEmail(login.getEmail()).orElse(null);
 
         if (storedUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with this email doesn't exist");
@@ -57,29 +60,80 @@ public class UserController {
 
     @GetMapping("/getrole")
     public ResponseEntity<Map<String, String>> getUserRole(@RequestParam String firstname, @RequestParam String lastname) {
-        User user = userrepository.findByFirstNameAndLastName(firstname, lastname);
+        User user = userRepository.findByFirstNameAndLastName(firstname, lastname);
         if (user != null) {
             Map<String, String> response = new HashMap<>();
-            response.put("role", user.getRole().name()); // Convert enum to string
+            response.put("role", user.getRole().name());
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("role", "CUSTOMER"));
     }
 
-
-
     @GetMapping("/api/get-user-details")
     public ResponseEntity<?> getUserDetails(@RequestParam String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        Optional<User> userOptional = userrepository.findByEmail(email);
-
-        if (userOptional.isPresent()) {
-            // Return user details as a response
-            return ResponseEntity.ok(userOptional.get());
-        } else {
+        if (userOptional.isEmpty()) {
             return ResponseEntity.status(404).body("User not found");
         }
+
+        User user = userOptional.get();
+
+        // If user is a Customer, return the Customer entity (with address)
+        if (user instanceof Customer) {
+            return ResponseEntity.ok((Customer) user);
+        }
+
+        // Otherwise, return the User entity as is (without address)
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/update-profile/{id}")
+    public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        User user = userOptional.get();
+
+        // Only allow updates if user is Customer (or you can allow others based on logic)
+        if (!(user instanceof Customer)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only customers can update profile here");
+        }
+
+        Customer customer = (Customer) user;
+
+        // Update email if present and not already taken by another user
+        if (updates.containsKey("email")) {
+            String newEmail = updates.get("email").trim();
+            if (!newEmail.isEmpty() && !newEmail.equals(customer.getEmail())) {
+                if (userRepository.findByEmail(newEmail).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use");
+                }
+                customer.setEmail(newEmail);
+            }
+        }
+
+        // Update phone number if present
+        if (updates.containsKey("phoneNum")) {
+            String newPhone = updates.get("phoneNum").trim();
+            if (!newPhone.isEmpty()) {
+                customer.setPhoneNum(newPhone);
+            }
+        }
+
+        // Update password if present
+        if (updates.containsKey("password")) {
+            String newPassword = updates.get("password").trim();
+            if (!newPassword.isEmpty()) {
+                customer.setPassword(newPassword);
+            }
+        }
+
+        userRepository.save(customer);
+
+        return ResponseEntity.ok("Profile updated successfully");
     }
 
 }
-

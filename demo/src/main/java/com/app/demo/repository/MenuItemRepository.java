@@ -13,4 +13,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItem,Long> {
     Optional<MenuItem> findByname(String name);
 
     void deleteByname(String name);
+
+    Optional<MenuItem> findByName(String name);
 }

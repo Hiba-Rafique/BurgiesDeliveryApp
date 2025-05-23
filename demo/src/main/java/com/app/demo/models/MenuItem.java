@@ -21,7 +21,14 @@ public class MenuItem {
     private Admin createdBy;
 
     public MenuItem(){}
-    public MenuItem(long id, String name, String description, double price, String image) {}
+
+    public MenuItem(String name, String description, double price, String image) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.image = image;
+    }
+
 
     public long getId() { return id; }
 

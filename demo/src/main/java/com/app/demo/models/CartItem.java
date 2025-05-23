@@ -1,5 +1,6 @@
 package com.app.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,10 +19,28 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "cart_id")
+    @JsonBackReference
     private Cart cart;
+
 
     public CartItem(){}
     public CartItem(MenuItem menuItem, int quantity) {}
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
 
     public MenuItem getMenuItem() { return menuItem; }
     public void setMenuItem(MenuItem menuItem) { this.menuItem = menuItem; }
@@ -31,4 +50,6 @@ public class CartItem {
 
     public double getTotalPrice() { return totalPrice; }
     public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
+
+
 }
