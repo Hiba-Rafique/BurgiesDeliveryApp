@@ -31,13 +31,8 @@ public class CartItemController {
         public Long menuItemId;
         public int quantity;
     }
-
     @PostMapping
     public ResponseEntity<?> addCartItem(@RequestBody AddCartItemRequest request) {
-        if (request.quantity <= 0) {
-            return ResponseEntity.badRequest().body("Quantity must be greater than zero");
-        }
-
         Optional<Customer> customerOpt = customerRepository.findById(request.customerId);
         if (!customerOpt.isPresent()) {
             return ResponseEntity.badRequest().body("Customer not found");
@@ -70,10 +65,22 @@ public class CartItemController {
 
         if (existingCartItem != null) {
             int newQuantity = existingCartItem.getQuantity() + request.quantity;
-            existingCartItem.setQuantity(newQuantity);
-            existingCartItem.setTotalPrice(menuItem.getPrice() * newQuantity);
-            cartItemRepository.save(existingCartItem);
+
+            if (newQuantity <= 0) {
+                // Delete the item
+                cart.getCartItems().remove(existingCartItem);
+                cartItemRepository.delete(existingCartItem);
+                cartRepository.save(cart);
+            } else {
+                existingCartItem.setQuantity(newQuantity);
+                existingCartItem.setTotalPrice(menuItem.getPrice() * newQuantity);
+                cartItemRepository.save(existingCartItem);
+            }
         } else {
+            if (request.quantity <= 0) {
+                return ResponseEntity.badRequest().body("Quantity must be greater than zero for new items");
+            }
+
             CartItem cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setMenuItem(menuItem);

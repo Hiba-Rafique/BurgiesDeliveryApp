@@ -12,13 +12,13 @@ public class OrderSummaryDTO {
     public Long orderId;
     public LocalDateTime date;
     public OrderStatus status;
-    public List<OrderItem> items;  // changed from List<String> to List<OrderItem>
+    public List<OrderItem> items;
 
     public OrderSummaryDTO(Order order) {
         this.orderId = order.getId();
         this.date = order.getDate();
         this.status = order.getStatus();
-        this.items = order.getOrderItems();  // directly assign the list of OrderItems
+        this.items = order.getOrderItems();
     }
 }
 

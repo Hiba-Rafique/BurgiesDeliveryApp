@@ -85,7 +85,7 @@ public class MenuItemController {
         @PutMapping("/edit/{name}")
         public ResponseEntity<MenuItem> editMenuItem(@PathVariable("name") String name, @RequestBody MenuItem menuItemDetails) {
                 try {
-                        Optional<MenuItem> existingMenuItem = menuItemRepository.findByName(name);  // <-- findByName instead of findById
+                        Optional<MenuItem> existingMenuItem = menuItemRepository.findByName(name);
                         if (existingMenuItem.isPresent()) {
                                 MenuItem existingItem = existingMenuItem.get();
 
