@@ -86,9 +86,9 @@ Future<void> _submit() async {
         await box.put('userPhone', _phoneCtrl.text.trim());
         await box.put('userRole', userRole);
 
-        // Now fetch user details to get the ID and save it
+        
         final idUrl = Uri.parse(
-            'https://eliuwjh1sfjv.share.zrok.io/api/get-user-details?email=${_emailCtrl.text.trim()}');
+            'https://eliuwjh1sfjv.share.zrok.io/api/api/get-user-details?email=${_emailCtrl.text.trim()}');
         final idResponse = await http.get(idUrl);
 
         if (idResponse.statusCode == 200) {

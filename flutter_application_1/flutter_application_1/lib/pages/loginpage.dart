@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
           await box.put('userAddress', userDetails['address']);
 
           // Added customerId saving here:
-          await box.put('customerId', userDetails['id']); // Change key if needed
+          await box.put('customerId', userDetails['id']); 
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Login successful!')),
