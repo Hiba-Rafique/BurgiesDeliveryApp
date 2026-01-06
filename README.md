@@ -1,16 +1,39 @@
-# flutter_application_1
+# Burgies Delivery App
 
-A new Flutter project.
+Burgies Delivery App is a food ordering and delivery application designed for a seamless customer experience. Users can browse menu items, add items to their cart, place orders, and track their order history. The app is built using **Flutter** for the frontend, **Spring Boot** for the backend, and **MySQL** for the database.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+### Customer Features:
+- Browse a full menu of Burgies items.
+- Add items to cart and customize quantities.
+- Place orders with a single tap.
+- View order history and status.
+- Offline access to menu items using local storage (Hive).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Admin Features:
+- Add, update, and delete menu items.
+- Manage orders and view order history for all customers.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Backend Features:
+- RESTful API using Spring Boot.
+- Secure database interactions with MySQL.
+- Email verification at signup (login restricted until verification).
+- Cart management with one-to-many relationship between Cart and CartItems.
+- Order management with status tracking.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Flutter |
+| Backend | Spring Boot (Java) |
+| Database | MySQL |
+| Local Storage | Hive (Flutter) |
+| API | RESTful API |
+
+---
